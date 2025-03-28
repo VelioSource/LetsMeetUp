@@ -1,0 +1,128 @@
+@font-face {
+    font-family: headFont;
+    src: url(ui/fonts/Summer-Vibes-OTF.otf);
+}
+
+@font-face {
+    font-family: UserFont;
+    src: url(ui/fonts/OpenSans-Regular.ttf);
+}
+
+
+#wrapper{/**/
+
+    max-width: 900px;
+    min-height: 500px;
+    display: flex; 
+    margin: auto; /*Alligning the wrapper to the middle*/
+    color: white;
+    font-family: userFont;
+    font-size: 14px;
+}
+
+
+#left_pannel{
+
+    min-height: 400px;
+    background-color: #27344b;
+    flex: 1;
+    text-align: center;
+
+}
+
+#profile_image{
+    width: 50%;
+    border: solid thin white;
+    border-radius: 50%;
+    margin: 10px;
+}
+
+
+#left_pannel label{
+
+    width: 100%;
+    height: 20px;
+    display: block;
+    background-color: #373d47;
+    border-bottom: solid thin #ffffff55;
+    cursor: pointer;
+    padding: 5px;
+    transition: all 300ms ease;
+    
+}
+
+#left_pannel label:hover{
+
+    background-color: #5c6779;
+    border-bottom: solid thin #ffffff55;
+    cursor: pointer;
+    padding: 5px;
+    
+}
+
+#left_pannel label img{
+
+    float: right;
+    width: 25px;
+    
+}
+
+#right_pannel{
+
+    min-height: 400px;
+    flex: 4;
+}
+
+#header{
+    background-color: #4a586a;
+    height: 70px;
+    font-size: 40px;
+    text-align: center;
+    font-family: headFont;
+}
+
+#inner_left_pannel{
+    background-color: #383e48;
+    min-height: 430px;
+    flex: 1;
+}
+
+#inner_right_pannel{
+    background-color: #b3b3b3;
+    min-height: 430px;
+    flex: 2;
+    transition: all 1s ease;
+}
+
+#contact_box:checked ~ #inner_right_pannel{
+    flex: 0;
+}
+
+#settings_box:checked ~ #inner_right_pannel{
+    flex: 0;
+}
+
+#container{
+    display: flex;
+}
+
+#contact{
+
+    width: 150px;
+    height: 170px;
+    margin: 10px;
+    display: inline-block;
+    vertical-align: top;
+    overflow: hidden;
+}
+
+#contact img{
+
+    width: 100%;
+
+}
+
+#contact_pannel{
+    text-align: center;
+
+}

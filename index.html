@@ -40,23 +40,7 @@
 
                
                 <div id="inner_left_pannel">
-                    <div id="contact_pannel">
-                        <div id="contact">
-                            <img src="./ui/images/user1.jpg" alt="user2">
-                            <br>Username
-                        </div>
-                       
-                        <div id="contact">
-                            <img src="./ui/images/user2.jpg" alt="user2">
-                            <br>Username
-                        </div>
-                       
-                        <div id="contact">
-                            <img src="./ui/images/user3.jpg" alt="user2">
-                            <br>Username
-                       
-                        </div>
-                    </div>
+                  
                 </div>
                 
                 <input type="radio" id="chat_box" name="banana" style="display: none;">
@@ -86,6 +70,33 @@
         }
    
    }
+
+   function get_contacts(e)
+   {
+        get_data({},"contacts");
+
+   }
+
+   function get_chat(e)
+   {
+        get_data({},"chat");
+
+   }
+
+   function get_settings(e)
+   {
+        get_data({},"settings");
+
+   }
+
+   var label_chat= _("label_chat");
+   label_chat.addEventListener("click", get_chat);
+  
+   var label_settings= _("label_settings");
+   label_settings.addEventListener("click", get_settings);
+
+   var label_contacts= _("label_contacts");
+   label_contacts.addEventListener("click", get_contacts);
 
    var logout = _("logout");
    logout.addEventListener("click", logout_user);
@@ -122,8 +133,24 @@
                 case "user_info":
                     var username = _("username");
                     var email = _("email");
+                  
                     username.innerHTML = obj.username;
                     email.innerHTML = obj.email;
+                break;
+                case "contacts":
+                    var inner_left_pannel_contacts = _("inner_left_pannel");
+                    
+                    inner_left_pannel_contacts.innerHTML = obj.message;
+                break;
+                case "chat":
+                    var inner_left_pannel_chat = _("inner_left_pannel");
+                    
+                    inner_left_pannel_chat.innerHTML = obj.message;
+                break;
+                case "settings":
+                    var inner_left_pannel = _("inner_left_pannel");
+                    
+                    inner_left_pannel.innerHTML = obj.message;
                 break;
             }
         }

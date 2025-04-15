@@ -58,7 +58,9 @@
 </html>
 
 <script type="text/javascript">
-  
+ 
+  var CURRENT_CHAT_USER = "";
+
   function _(element) {
         return document.getElementById(element);
    }
@@ -88,6 +90,21 @@
    {
         get_data({},"settings");
 
+   }
+   function send_message(e)
+   {
+        var message_text = _("message_text");
+        if(message_text.value.trim() == ""){
+            alert("Message is empty");    
+            return;
+        }
+        alert(message_text.value);
+        get_data({
+            
+            message:message_text.value.trim(),
+            user_id:CURRENT_CHAT_USER
+        
+        },"send_message");
    }
 
    var label_chat= _("label_chat");
@@ -125,9 +142,12 @@
    }
 
    function handle_result(result,type){
+   
     
     if(result.trim() != ""){
-       
+        var inner_right_pannel_contacts = _("inner_right_pannel");
+        inner_right_pannel_contacts.style.overflow= "visible";
+
         var obj= JSON.parse(result);
         if(typeof(obj.logged_in) != "undefined" && !obj.logged_in)
         {
@@ -147,12 +167,15 @@
                 case "contacts":
                     var inner_left_pannel_contacts = _("inner_left_pannel");
                     
+                    inner_right_pannel_contacts.style.overflow= "hidden";
                     inner_left_pannel_contacts.innerHTML = obj.message;
                 break;
                 case "chat":
                     var inner_left_pannel_chat = _("inner_left_pannel");
                     
-                    inner_left_pannel_chat.innerHTML = obj.message;
+                    inner_left_pannel_chat.innerHTML = obj.user;
+                    inner_right_pannel.innerHTML = obj.messages;
+
                 break;
                 case "settings":
                     var inner_left_pannel = _("inner_left_pannel");
@@ -164,6 +187,11 @@
                     get_data({},"user_info");
                     get_settings(true);
                 break;
+                case "send_message":
+                    alert(obj.message);
+                    get_settings(true);
+                break;
+                
         
 
             }
@@ -174,6 +202,10 @@
    }
 
    get_data({},"user_info");
+   get_data({},"contacts");
+
+   var contact_box = _("contact_box");
+   contact_box.checked = true;
 
 
 </script>
@@ -333,5 +365,21 @@
         }else{
             e.target.className = "";
         }
+    }
+
+    function start_chat(e){
+        
+        var user_id = e.target.getAttribute("userid");
+        if(e.target.id == ""){
+            user_id=e.target.parentNode.getAttribute("userid");    
+        }
+
+        CURRENT_CHAT_USER = user_id;
+        
+        console.log(user_id);
+        var chat_box = _("chat_box");
+        chat_box.checked = true;
+        get_data({user_id:CURRENT_CHAT_USER},"chat");//moje da ima greshka
+
     }
     </script> 

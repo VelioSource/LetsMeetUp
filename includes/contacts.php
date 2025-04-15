@@ -1,11 +1,25 @@
 <?php
-
-    $sql = "select * from users limit 10";
+    $myid = $_SESSION['userid'];  
+    $sql = "select * from users where user_id != '$myid' limit 10";
     $myusers = $DB->read($sql,[]);
 
     $mydata =
     //if you want animations video 32 
-     '<div style="text-align: center;">';
+    '
+    <style>
+        #contact{
+            cursor:pointer;
+            transition: all .2s ease;
+        }
+        #contact:hover{
+            transform: scale(1.1);
+        }
+
+    
+    </style>
+     
+     
+    <div style="text-align: center;">';
 
        
         if(is_array($myusers))
@@ -17,7 +31,7 @@
                     $image= $row->image;
                 }                
                 $mydata .= "
-                <div id='contact'>
+                <div id='contact' userid='$row->user_id' onclick='start_chat(event)'>
                     <img src=$image alt='user'>
                     <br>$row->username
                 </div>";

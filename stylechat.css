@@ -13,6 +13,7 @@
 
     max-width: 900px;
     min-height: 500px;
+    max-height: 630px;
     display: flex; 
     margin: auto; /*Alligning the wrapper to the middle*/
     color: white;
@@ -85,12 +86,14 @@
 #inner_left_pannel{
     background-color: #383e48;
     min-height: 430px;
+    max-height: 530px;
     flex: 1;
 }
 
 #inner_right_pannel{
     background-color: #b3b3b3;
     min-height: 430px;
+    max-height: 530px;
     flex: 2;
     transition: all 1s ease;
 }
@@ -128,6 +131,107 @@
 
 }
 
+
+#active_contact{
+
+   
+    height: 70px;
+    margin: 10px;
+    border: solid thin #aaa;
+    padding: 5px;
+    background-color: #7d7d7dac;
+
+}
+
+#active_contact img{
+
+    width: 70px;
+    height:70px;
+    float: left;
+    margin: 2px;
+
+}
+#message_left{
+
+    height: 70px;
+    margin: 10px;
+    padding: 2px;
+    padding-right: 10px;
+    background-color: #ffffff;
+    text-align: center;
+    color: #444;
+    float: left;
+    box-shadow: 0px 0px 10px #aaa;
+    border-bottom-left-radius: 50%;
+    position: relative;
+    width: 80%;
+    min-width: 200px;
+
+}
+
+#message_left img{
+
+    width: 60px;
+    height: 60px;
+    float: left;
+    margin: 2px;
+    border-radius: 50%;
+    border: solid 2px white;
+
+}
+#message_left div{
+
+    width: 20px;
+    height: 20px;
+    background-color: #34474f;
+    border: solid 2px white;
+    border-radius: 50%;
+    position: absolute;
+    left: -10px;
+    top: 20px;
+}
+
+#message_right{
+
+    height: 70px;
+    margin: 10px;
+    padding: 2px;
+    padding-right: 10px;
+    background-color: #5acbff;
+    text-align: center;
+    color: #ffffff;
+    float: right;
+    box-shadow: 0px 0px 10px #aaa;
+    border-bottom-right-radius: 50%;
+    position: relative;
+    width: 80%;
+    min-width: 200px;
+
+}
+
+#message_right img{
+
+    width: 60px;
+    height: 60px;
+    float: left;
+    margin: 2px;
+    border-radius: 50%;
+    border: solid 2px white;
+
+}
+#message_right div{
+   
+    
+    width: 20px;
+    height: 20px;
+    background-color: #34474f;
+    border: solid 2px white;
+    border-radius: 50%;
+    position: absolute;
+    right: -10px;
+    top: 20px;
+}
+
 .loader_on{
     position: absolute;
     width: 20%;
@@ -138,3 +242,4 @@
    display: none;
 
 }
+

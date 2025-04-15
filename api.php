@@ -55,4 +55,34 @@ if(isset($DATA_OBJ->data_type) && $DATA_OBJ->data_type == "signup")
     //settings
     include("includes/save_settings.php");
 } 
+elseif(isset($DATA_OBJ->data_type) && $DATA_OBJ->data_type == "send_message")
+{
+    //send message to database
 
+    include("includes/send_message.php");
+} 
+
+function message_left($result)
+{
+    return "
+    <div id='message_left'>
+    <div></div>
+        <img src=$result->image alt='user'>
+        <b>$result->username</b><br>
+        This is a test message<br><br>
+        <span style='font-size:10px;color:#6f6666;'>20 Jan 2020 10:00 am<span>
+    </div> ";
+}
+
+function message_right($result)
+{
+    return "
+    <div id='message_right'>
+    <div></div>
+        <img src=$result->image alt='user' style='float:right;'>
+        <b>$result->username</b><br><br>
+        This is a test message<br>
+        <span style='font-size:10px;color:#fff2f;'>20 Jan 2020 10:00 am<span>
+    </div>";
+
+}

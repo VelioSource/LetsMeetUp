@@ -21,6 +21,13 @@ $info = (object)[];
         {
             $result = $result[0];
             $result->data_type = "user_info";
+            
+            //check if image exists
+                $image = ($result->gender == "Male") ? "./ui/images/user_male.jpg" : "./ui/images/user_male.jpg";
+                if(file_exists($result->image)){
+                    $image= $result->image;
+                }   
+                $result->image = $image;
             echo json_encode($result);
         }else {
             $info->message = "Wrong email or password!";

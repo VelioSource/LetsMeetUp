@@ -11,7 +11,7 @@
 
         <div id="left_pannel">
             <div id="user_info" style="padding: 10px;">
-                <img id="profile_image" src="ui/images/user_male.jpg">
+                <img id="profile_image" src="ui/images/user_male.jpg" style="height: 100px;width: 100px;">
                 <br>
                 <span id="username"> Username </span>
                 <br>
@@ -35,10 +35,11 @@
         </div>
 
         <div id="right_pannel">
-            <div id="header">Let's Meet Up!</div>
+            <div id="header">
+                <div id="loader_holder" class="loader_on"><img style="width: 70px; height: 70px;" src="./ui/icons/giphy.gif" alt="loader_gif"></div>
+                Let's Meet Up!
+            </div>
             <div id="container">
-
-               
                 <div id="inner_left_pannel">
                   
                 </div>
@@ -103,10 +104,13 @@
 
    function get_data(find, type){
         var xml=new XMLHttpRequest();
-
+        var loader_holder = _("loader_holder");
+        loader_holder.className = "loader_on";
+        
         xml.onload = function(){
             if(xml.readyState == 4 || xml.status == 200)
             {
+                loader_holder.className = "loader_off";
                handle_result(xml.responseText, type);     
             }
         }
@@ -133,9 +137,12 @@
                 case "user_info":
                     var username = _("username");
                     var email = _("email");
+                    var profile_image = _("profile_image");
+
                   
                     username.innerHTML = obj.username;
                     email.innerHTML = obj.email;
+                    profile_image.src = obj.image;
                 break;
                 case "contacts":
                     var inner_left_pannel_contacts = _("inner_left_pannel");
@@ -152,6 +159,13 @@
                     
                     inner_left_pannel.innerHTML = obj.message;
                 break;
+                case "save_settings":
+                    alert(obj.message);
+                    get_data({},"user_info");
+                    get_settings(true);
+                break;
+        
+
             }
         }
 
@@ -161,4 +175,163 @@
 
    get_data({},"user_info");
 
+
 </script>
+
+<script type="text/javascript">
+        
+    
+
+    function collect_data(){
+
+            var save_settings_button= _("save_settings_button");
+            save_settings_button.disabled = true;
+            save_settings_button.value = "Loading...Please wait.";
+
+            var myform = _("myform")
+            var input = myform.getElementsByTagName("INPUT");
+
+            var data = {};
+            for(var i= input.length - 1; i >= 0; i--)
+            {
+
+            var key =  input[i].name;
+
+            switch(key){
+
+                    case "username":
+                        data.username = input[i].value;
+                    break;
+
+                    case "email":
+                        data.email = input[i].value;
+                    break;
+                    
+                    case "gender":
+                        if(input[i].checked)
+                            {
+                                data.gender=input[i].value;
+                            }
+                    break;
+
+                    case "password":
+                        data.password = input[i].value;
+                    break;
+
+                    case "password2":
+                        data.password2 = input[i].value;
+                    break;
+
+            }
+            }
+
+            send_data(data,"save_settings");
+            
+            
+
+    }
+    
+    function send_data(data, type) {
+        console.log("send_data() called with:", data, type);
+
+        var xml = new XMLHttpRequest();
+        
+        xml.onreadystatechange = function() {
+            console.log("Ready state changed:", xml.readyState);
+            if (xml.readyState == 4) {
+                console.log("Request completed with status:", xml.status);
+                console.log("Response:", xml.responseText);
+                
+                var save_settings_button= _("save_settings_button");
+
+                save_settings_button.disabled = false;
+                save_settings_button.value = "Sign up";
+            
+                
+                if (xml.status == 200) {
+                    handle_result(xml.responseText);
+                    save_settings_button.disabled = false;
+                    save_settings_button.value = "Sign up";
+                } else {
+                    console.error("Request failed:", xml.status);
+                }
+            }
+        };
+
+        data.data_type = type;
+        var data_string = JSON.stringify(data);
+
+        console.log("Opening request...");
+        xml.open("POST", "api.php", true);
+        xml.setRequestHeader("Content-Type", "application/json");
+
+        console.log("Sending request...");
+        xml.send(data_string);
+        console.log("Request sent!");
+    }
+    
+
+    function upload_profile_image(files){
+
+        var change_image_button= _("change_image_button");
+        change_image_button.disabled = true;
+        change_image_button.innerHTML = "Uploading Image...";
+        //adding a form
+        var myform = new FormData();
+        //starting a xml request
+        var xml = new XMLHttpRequest();
+        
+        xml.onreadystatechange = function() {
+            console.log("Ready state changed:", xml.readyState);
+            if (xml.readyState == 4) {
+              
+                console.log("Request completed with status:", xml.status);
+                console.log("Response:", xml.responseText);
+         
+                change_image_button.disabled = false;
+                change_image_button.innerHTML = "Change Image";
+            
+                
+                if (xml.status == 200) {
+                    //alert(xml.responseText);
+                    get_data({},"user_info");
+                    get_settings(true);
+                    change_image_button.disabled = false;
+                    change_image_button.innerHTML = "Change Image";
+                } else {
+                    console.error("Request failed:", xml.status);
+                }
+            }
+        };
+        //appending information
+        myform.append('file',files[0]);
+        myform.append('data_type',"change_profile_image");
+
+        console.log("Opening request...");
+        xml.open("POST", "uploader.php", true);
+        //sending the form to api.php
+        console.log("Sending request...");
+        xml.send(myform);
+        console.log("Request sent!");
+        
+    }
+
+    function handle_drag_and_drop(e){
+        if(e.type == "dragover"){
+
+            e.preventDefault();
+            e.target.className = "dragging";
+
+        }else if(e.type == "dragleave"){
+            e.target.className = "";
+        }
+        else if(e.type == "drop"){
+            e.preventDefault();
+            e.target.className="";
+
+            upload_profile_image(e.dataTransfer.files);
+        }else{
+            e.target.className = "";
+        }
+    }
+    </script> 

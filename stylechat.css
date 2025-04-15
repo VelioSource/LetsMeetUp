@@ -79,6 +79,7 @@
     font-size: 40px;
     text-align: center;
     font-family: headFont;
+    position: relative;
 }
 
 #inner_left_pannel{
@@ -124,5 +125,16 @@
 
 #contact_pannel{
     text-align: center;
+
+}
+
+.loader_on{
+    position: absolute;
+    width: 20%;
+
+}
+
+.loader_off{
+   display: none;
 
 }

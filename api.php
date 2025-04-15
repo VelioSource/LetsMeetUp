@@ -50,4 +50,9 @@ if(isset($DATA_OBJ->data_type) && $DATA_OBJ->data_type == "signup")
 {
     //settings
     include("includes/settings.php");
+}elseif(isset($DATA_OBJ->data_type) && $DATA_OBJ->data_type == "save_settings")
+{
+    //settings
+    include("includes/save_settings.php");
 } 
+

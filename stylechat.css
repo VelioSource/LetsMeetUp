@@ -1,0 +1,298 @@
+@font-face {
+    font-family: headFont;
+    src: url(ui/fonts/Summer-Vibes-OTF.otf);
+}
+
+@font-face {
+    font-family: UserFont;
+    src: url(ui/fonts/OpenSans-Regular.ttf);
+}
+
+
+#wrapper{/**/
+
+    max-width: 900px;
+    min-height: 500px;
+    max-height: 630px;
+    display: flex; 
+    margin: auto; /*Alligning the wrapper to the middle*/
+    color: white;
+    font-family: userFont;
+    font-size: 14px;
+}
+
+
+#left_pannel{
+
+    min-height: 400px;
+    background-color: #27344b;
+    flex: 1;
+    text-align: center;
+
+}
+
+#profile_image{
+    width: 50%;
+    border: solid thin white;
+    border-radius: 50%;
+    margin: 10px;
+}
+
+
+#left_pannel label{
+
+    width: 100%;
+    height: 20px;
+    display: block;
+    background-color: #373d47;
+    border-bottom: solid thin #ffffff55;
+    cursor: pointer;
+    padding: 5px;
+    transition: all 300ms ease;
+    
+}
+
+#left_pannel label:hover{
+
+    background-color: #5c6779;
+    border-bottom: solid thin #ffffff55;
+    cursor: pointer;
+    padding: 5px;
+    
+}
+
+#left_pannel label img{
+
+    float: right;
+    width: 25px;
+    
+}
+
+#right_pannel{
+
+    min-height: 400px;
+    flex: 4;
+}
+
+#header{
+    background-color: #4a586a;
+    height: 70px;
+    font-size: 40px;
+    text-align: center;
+    font-family: headFont;
+    position: relative;
+}
+
+#inner_left_pannel{
+    background-color: #383e48;
+    min-height: 430px;
+    max-height: 530px;
+    flex: 1;
+}
+
+#inner_right_pannel{
+    background-color: #b3b3b3;
+    min-height: 430px;
+    max-height: 530px;
+    flex: 2;
+    transition: all 1s ease;
+}
+
+#contact_box:checked ~ #inner_right_pannel{
+    flex: 0;
+}
+
+#settings_box:checked ~ #inner_right_pannel{
+    flex: 0;
+}
+
+#container{
+    display: flex;
+}
+
+#contact{
+
+    width: 100px;
+    height: 120px;
+    margin: 10px;
+    display: inline-block;
+    vertical-align: top;
+}
+
+#contact img{
+
+    width: 100px;
+    height:100px;
+
+}
+
+#contact_pannel{
+    text-align: center;
+
+}
+
+
+#active_contact{
+
+   
+    height: 70px;
+    margin: 10px;
+    border: solid thin #aaa;
+    padding: 5px;
+    background-color: #7d7d7dac;
+
+}
+
+#active_contact img{
+
+    width: 70px;
+    height:70px;
+    float: left;
+    margin: 2px;
+
+}
+#message_left{
+
+    margin: 10px;
+    padding: 2px;
+    padding-right: 10px;
+    background-color: #ffffff;
+    text-align: center;
+    color: #444;
+    float: left;
+    box-shadow: 0px 0px 10px #aaa;
+    border-bottom-left-radius: 50%;
+    position: relative;
+    width: 80%;
+    min-width: 200px;
+
+}
+
+#message_left #prof_img{
+
+    width: 60px;
+    height: 60px;
+    float: left;
+    margin: 2px;
+    border-radius: 50%;
+    border: solid 2px white;
+
+}
+#message_left div{
+
+    width: 20px;
+    height: 20px;
+    background-color: #34474f;
+    border: solid 2px white;
+    border-radius: 50%;
+    position: absolute;
+    left: -10px;
+    top: 20px;
+}
+
+#message_right{
+
+    margin: 10px;
+    padding: 2px;
+    padding-right: 10px;
+    background-color: #5acbff;
+    text-align: center;
+    color: #ffffff;
+    float: right;
+    box-shadow: 0px 0px 10px #aaa;
+    border-bottom-right-radius: 50%;
+    position: relative;
+    width: 80%;
+    min-width: 200px;
+
+}
+
+#message_right #prof_img{
+
+    width: 60px;
+    height: 60px;
+    float: left;
+    margin: 2px;
+    border-radius: 50%;
+    border: solid 2px white;
+
+}
+
+#message_right div img{
+
+    width: 18px;
+    height: 18px;
+    float: none;
+    margin: 0px;
+    border-radius: 50%;
+    border: none;
+    position: absolute;
+    top:20px;
+    right: 1px;
+
+}
+
+#message_left #trash{
+
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top:15px;
+    right: -15px;
+    cursor: pointer;
+
+}
+#message_right #trash{
+
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top:15px;
+    left: -15px;
+    cursor: pointer;
+
+}
+
+#message_right div{
+   
+    
+    width: 20px;
+    height: 20px;
+    background-color: #34474f;
+    border: solid 2px white;
+    border-radius: 50%;
+    position: absolute;
+    right: -10px;
+    top: 20px;
+}
+
+.loader_on{
+    position: absolute;
+    width: 20%;
+
+}
+
+.loader_off{
+   display: none;
+
+}
+
+#img_viewer{
+    
+}
+
+.image_on{
+
+    position: absolute;
+    height: 450px;
+    width: 450px;
+    margin:auto;
+    z-index: 10;
+    top:50px;
+    left:50px;
+} 
+
+.image_off{
+   display: none;
+}
+

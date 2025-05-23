@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../LMchat/signupcss.css">
+    <title>Chat</title>
+</head>
+<body>
+    <div id="wrapper">
+        <div class="header">
+            Let's Meet Up!
+            <div style="font-size: 40px;"> Sign up</div>
+        </div>
+        <div id="error">SOME TEXT</div>
+        <form id="myform">
+        <input type="text" name="username" placeholder="Username"><br>
+        <input type="text" name="email" placeholder="E-mail"><br>
+        
+        
+        <div style="padding: 10px;">
+        <br>Gender:<br>
+        <input type="radio" value="Male" name="gender_male"> Male<br>
+        <input type="radio" value="Female" name="gender_female"> Female<br>
+        </div>
+
+
+        <input type="password" name="password" placeholder="Password"><br>
+        <input type="password" name="password2" placeholder="Retype Password"><br>   
+        <input type="submit" value="Sign up" id="signup_button"><br>
+
+        <br>
+        <a id="have_account" href="./login.html" >
+            You already have an account? Let's Log in!
+        </a>
+
+      </form>
+
+    </div>
+</body>
+</html>
+
+<script type="text/javascript">
+  
+  function _(element) {
+        return document.getElementById(element);
+   }
+
+   
+   var signup_button= _("signup_button");
+   signup_button.addEventListener("click",collect_data);
+
+   function collect_data(){
+
+        signup_button.disabled = true;
+        signup_button.value = "Loading...Please wait.";
+
+        var myform = _("myform")
+        var input = myform.getElementsByTagName("INPUT");
+
+        var data = {};
+        for(var i= input.length - 1; i >= 0; i--)
+        {
+
+          var key =  input[i].name;
+
+          switch(key){
+
+                case "username":
+                    data.username = input[i].value;
+                break;
+
+                case "email":
+                    data.email = input[i].value;
+                break;
+                
+                case "gender_male":
+                case "gender_female":
+                    if(input[i].checked)
+                        {
+                            data.gender=input[i].value;
+                        }
+                break;
+
+                case "password":
+                    data.password = input[i].value;
+                break;
+
+                case "password2":
+                    data.password2 = input[i].value;
+                break;
+
+          }
+        }
+
+        send_data(data,"signup");
+        
+        
+
+   }
+   
+   function send_data(data, type) {
+    console.log("send_data() called with:", data, type);
+
+    var xml = new XMLHttpRequest();
+    
+    xml.onreadystatechange = function() {
+        console.log("Ready state changed:", xml.readyState);
+        if (xml.readyState == 4) {
+            console.log("Request completed with status:", xml.status);
+            console.log("Response:", xml.responseText);
+            signup_button.disabled = false;
+            signup_button.value = "Sign up";
+
+            if (xml.status == 200) {
+                handle_result(xml.responseText);
+                signup_button.disabled = false;
+                signup_button.value = "Sign up";
+            } else {
+                console.error("Request failed:", xml.status);
+            }
+        }
+    };
+
+    data.data_type = type;
+    var data_string = JSON.stringify(data);
+
+    console.log("Opening request...");
+    xml.open("POST", "api.php", true);
+    xml.setRequestHeader("Content-Type", "application/json");
+
+    console.log("Sending request...");
+    xml.send(data_string);
+    console.log("Request sent!");
+}
+
+function handle_result(result)
+{
+
+    var data = JSON.parse(result);
+    if(data.data_type == "info")
+    {
+        window.location = "index.html";
+    }else{
+
+        var error = _("error");
+        error.innerHTML = data.message;
+        error.style.display = "block";
+    }
+}
+
+</script>

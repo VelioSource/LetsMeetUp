@@ -1,0 +1,82 @@
+@font-face {
+    font-family: headFont;
+    src: url(ui/fonts/Summer-Vibes-OTF.otf);
+}
+@font-face {
+    font-family: UserFont;
+    src: url(ui/fonts/OpenSans-Regular.ttf);
+}
+
+
+#wrapper{/**/
+
+    max-width: 900px;
+    min-height: 500px;
+    margin: auto; /*Alligning the wrapper to the middle*/
+    color: grey;
+    font-family: userFont;
+    font-size: 14px;
+}
+
+#error{
+   
+    text-align: center;
+    padding: 0.5em;
+    background-color: red;
+    color: white;
+    display: none;
+}
+
+.header{
+    background-color: #4a586a;
+    font-size: 20px;
+    text-align: center;
+    font-family: headFont;
+    width: 100%;
+    color: white;
+
+}
+
+
+form{
+
+    margin: auto;
+    padding: 10px;
+    width: 100%;
+    max-width: 400px;
+}
+
+input[type=text], input[type=password], input[type=submit]{
+    
+    padding: 10px;
+    margin: 10px;
+    width: 98%;
+    border-radius: 5px;
+    border: solid 1px grey;
+
+}
+
+input[type=submit]{
+    width: 104%;
+    cursor: pointer;
+    background-color:rgb(95, 170, 164);
+    color: white;
+}
+
+input[type=radio]{
+
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+#logout{
+    float: right;
+
+}
+
+#no_account{
+
+    display: block;
+    text-align: center;
+    text-decoration: none;
+}

@@ -11,17 +11,101 @@
         <nav>
             <img class="banner" src="banner.png" alt="banner">
                 <a href="#" class="home">Home</a>
-                <a href="#">About</a>
+                <a href="about.html">About</a>
                 <div class="dropdown">
                     <a href="#" class="dropbtn">Safety</a>
                     <div class="droplist">
-                        <a href="guidelines.html" target="_blank">Community Guidelines</a>
-                        <a href="safety-tips.html" target="_blank">Safety Tips</a>
-                        <a href="security.html" target="_blank">Security</a>
+                        <a href="guidelines.html">Community Guidelines</a>
+                        <a href="safety-tips.html">Safety Tips</a>
+                        <a href="security.html">Security</a>
                     </div>
                 </div>
                 <button class="btnLogin">Login</button>
         </nav>
     </header>
-    <button class="btnSignup">Sign Up</buttonS>
+
+    
+    <h1 class="slogan">Turning New Places Into Familiar Faces.</h1>
+    <button class="btnSignup">Sign Up</button>
+    
+    <div class="info-scroll">
+      <div class="intro-block">
+        <h2>Let's Meet Up!</h2>
+        <p>
+          Let's Meet Up! helps students and expats find and connect with people from their home country or with similar interests while living abroad.
+        </p>
+        <div class="intro-button">
+          <a href="/login.html" class="btn-get-started">Get Started</a>
+        </div>
+      </div>
+      <div class="features-title">
+        <h2>Connect with People Like <span class="highlight">You</span></h2>
+        <p>Our platform makes it easy to find and connect with people who share your cultural background, language, and interests while living abroad.</p>
+      </div>
+      
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h3>🌐 Find Your Community</h3>
+          <p>Connect with people from your home country or those who share your cultural background.</p>
+        </div>
+        <div class="feature-card">
+          <h3>📅 Events & Meetups</h3>
+          <p>Organize and join local events to meet new friends in person and explore your host country.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🗣️ Language Practice</h3>
+          <p>Find conversation partners to practice your language skills or help others learn your native language.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🧠 Shared Interests</h3>
+          <p>Find people who enjoy the same hobbies, music, sports, or academic interests as you.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🌍 Cultural Exchange</h3>
+          <p>Learn about new cultures and share your own traditions with others in a supportive environment.</p>
+        </div>
+        <div class="feature-card">
+          <h3>🔒 Safe Communication</h3>
+          <p>Our platform includes messaging features with safety measures to ensure a positive experience.</p>
+        </div>
+      </div>
+
+      <div class="how-it-works">
+        <h2>How It Works</h2>
+        <p class="how-subtitle">Getting started with Let's Meet Up! is easy and only takes a few minutes.</p>
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <h3>Create Your Profile</h3>
+            <p>Sign up and tell us about yourself, your interests, and what you're looking for.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <h3>Find Your People</h3>
+            <p>Search for people based on nationality, language, interests, or location.</p>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <h3>Connect & Meet Up</h3>
+            <p>Send messages, join groups, and attend events to make new friends.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="cta-section">
+        <h2>Ready to Make New Friends?</h2>
+        <p>Join Let's Meet Up! today and start connecting with students from around the world.</p>
+        <div class="cta-button">
+          <a href="signup.html" class="btn-primary">Sign Up Now</a>
+        </div>
+      </div>
+    </div>
   </body>
+
+  <script>
+    document.querySelector('.btnSignup').addEventListener('click', function() {
+      window.location.href = 'signup.html';
+    });
+  </script>
+
+  </html>

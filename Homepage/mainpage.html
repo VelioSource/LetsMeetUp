@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Let's Meet Up! | Main Page</title>
+  <link href="mainpage.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <h1>Welcome to Let's Meet Up!</h1>
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <div class="toggle">
+          <label>
+            <input type="checkbox" id="filterToggle" onchange="toggleFilter()" checked />
+            Show only people with similar interests
+          </label>
+        </div>
+        <input class="search-bar" type="text" placeholder="Search by name, nationality or hobbies..." />
+      </div>
+    </div>
+
+    <div class="profiles" id="profilesContainer">
+      <!--Profiles will be injected here-->
+    </div>
+  </div>
+
+<script>
+  let allProfiles = [];
+  let userLocation = null;
+  let userInterests = [];
+
+  // Step 1: Get current user's interests
+  fetch("../../api.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data_type: "user_info" })
+  })
+  .then(res => res.json())
+  .then(user => {
+    if (user.data_type === "user_info") {
+      // Assume interests are saved as comma-separated string
+      userInterests = (user.interests || "").split(",").map(s => s.trim()).filter(Boolean);
+      initProfiles(); // proceed once we have user's interests
+    } else {
+      alert("Failed to load your preferences.");
+    }
+  });
+
+  // Step 2: Load all user profiles
+  function initProfiles() {
+    fetch("../../api.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data_type: "get_users" })
+    })
+    .then(res => res.json())
+    .then(data => {
+      allProfiles = data;
+      initLocation();
+    });
+  }
+
+  // Step 3: Get user’s real-time location
+function initLocation() {
+  if (confirm("Can we use your location to help you find people near you?")) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        userLocation = {
+          lat: position.coords.latitude,
+          lon: position.coords.longitude
+        };
+
+        // ✅ Save location to database
+        fetch("../../api.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            data_type: "update_location",
+            location_lat: userLocation.lat,
+            location_lon: userLocation.lon
+          })
+        })
+        .then(res => res.text())
+        .then(console.log);
+
+        renderProfiles(true);
+      },
+      () => renderProfiles(false)
+    );
+  } else {
+    renderProfiles(false);
+  }
+}
+
+  
+
+    document.querySelector('.search-bar').addEventListener('input', function (e) {
+      const query = e.target.value.toLowerCase().trim();
+      const filtered = allProfiles.filter(profile =>
+        profile.name.toLowerCase().includes(query) ||
+        (profile.nationality && profile.nationality.toLowerCase().includes(query)) ||
+        (profile.hobbies && profile.hobbies.some(h => h.toLowerCase().includes(query)))
+      );
+      renderProfiles(false, filtered);
+    });
+
+    function toggleFilter() {
+      const filter = document.getElementById("filterToggle").checked;
+      renderProfiles(filter);
+    }
+
+    function renderProfiles(filter = false, overrideList = null) {
+      const container = document.getElementById("profilesContainer");
+      container.innerHTML = '';
+
+      const profiles = overrideList || allProfiles;
+      let filtered = profiles;
+
+      if (filter) {
+        filtered = profiles.filter(profile => {
+          const hasCommon = profile.hobbies?.some(hobby => userInterests.includes(hobby));
+          if (userLocation && profile.lat && profile.lon) {
+            const dist = haversine(profile.lat, profile.lon, userLocation.lat, userLocation.lon);
+            return hasCommon && dist < 50;
+          } else {
+            return hasCommon;
+          }
+        });
+      }
+
+      for (const user of filtered) {
+        const distanceText = (userLocation && user.lat && user.lon)
+          ? `Approximately ${Math.round(haversine(user.lat, user.lon, userLocation.lat, userLocation.lon))} km away`
+          : '';
+
+        container.innerHTML += `
+          <div class="profile-card">
+            <h3>${user.name}</h3>
+            <p><strong>${user.nationality || ''}</strong></p>
+            <p>${user.type || ''}</p>
+            <p><strong>Hobbies:</strong></p>
+            <div class="profile-hobbies">
+              ${(user.hobbies || []).map(h => `<span>${h}</span>`).join('')}
+            </div>
+            ${distanceText ? `<p style="font-size: 0.85em; color: #555;">${distanceText}</p>` : ''}
+            <button class="chat-btn" onclick="startChat('${user.user_id}')">Chat</button>
+          </div>`;
+      }
+    }
+
+    function startChat(userId) {
+      window.location.href = `../../index.html?user=${userId}`;
+    }
+
+    function haversine(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    }
+
+    function toRad(deg) {
+      return deg * Math.PI / 180;
+    }
+  </script>
+</body>
+</html>

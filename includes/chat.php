@@ -139,7 +139,7 @@
             
                 $mydata .= "
                 <div id='active_contact'>
-                <div id='active_contact' userid='{$myuser->user_id}' onclick='start_chat(event)' style='cursor:pointer;'>
+                <div id='active_contact1' userid='{$myuser->user_id}' onclick='start_chat(event)' style='cursor:pointer;'>
                     <img src=$image alt='user'>
                     $myuser->username<br>
                     <span style='font-size:11px;'>'$data->message'</span>

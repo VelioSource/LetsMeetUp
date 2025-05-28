@@ -207,7 +207,10 @@
                 break;
                 case "chat_refresh":
                     SEEN_STATUS = false;
-                    var message_holder = _("message_holder");
+                    var messages_holder = _("message_holder");
+                    if (messages_holder) {
+                        messages_holder.scrollTo(0, messages_holder.scrollHeight);
+                    }
                     message_holder.innerHTML = obj.messages;
                     if(typeof obj.new_message != "undefined")
                     {

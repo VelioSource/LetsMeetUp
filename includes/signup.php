@@ -1,95 +1,103 @@
 <?php
 
 $info = (object)[];
-    //sign up, auto-generated
-    $data= false;
-    $data['user_id'] = $DB->generate_id(20);
-    $data['date'] = date('Y-m-d H:i:s');
-    //sign up, generated outside the api
-    $data['username'] = $DATA_OBJ->username;
-    
-    if(empty($DATA_OBJ->username))
-    {
-        $error .= "Please, enter a valid username. <br>";
-    }else{
-        
-        if(strlen($DATA_OBJ->username) < 4)
-        {
-            $error .= "Username must be at least 4 characters long. <br>";
-        }
-        if(!preg_match("/^[a-z A-Z 0-9 _ . -]*$/", $DATA_OBJ -> username))
-        {
-            $error .= "Please enter a valid username. <br>";
+$error = "";
+$data = [];
+
+// Auto-generated values
+$data['user_id'] = $DB->generate_id(20);
+$data['date'] = date('Y-m-d H:i:s');
+
+// Username
+$data['username'] = trim($DATA_OBJ->username);
+if (empty($data['username'])) {
+    $error .= "Please enter a valid username. <br>";
+} else {
+    if (strlen($data['username']) < 4) {
+        $error .= "Username must be at least 4 characters long. <br>";
+    }
+    if (!preg_match("/^[a-zA-Z0-9_.-]*$/", $data['username'])) {
+        $error .= "Username can only contain letters, numbers, and _ . - <br>";
+    }
+}
+
+// Gender
+$data['gender'] = $DATA_OBJ->gender ?? null;
+if (empty($data['gender']) || !in_array($data['gender'], ['Male', 'Female'])) {
+    $error .= "Please select a valid gender. <br>";
+}
+
+// Email
+$data['email'] = trim($DATA_OBJ->email);
+if (empty($data['email'])) {
+    $error .= "Please enter an email. <br>";
+} else {
+    if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+        $error .= "Invalid email format. <br>";
+    } else {
+        // Check if email already exists
+        $email_check = $DB->read("SELECT email FROM users WHERE email = :email", ['email' => $data['email']]);
+        if ($email_check) {
+            $error .= "This email is already registered. <br>";
         }
     }
+}
 
-    $data['gender'] = isset($DATA_OBJ->gender) ? $DATA_OBJ->gender : null;
-    if(empty($DATA_OBJ->gender))
-    {
-        $error .= "Please select a gender. <br>";
-    }else{
-        
-        if($DATA_OBJ -> gender != "Male" && $DATA_OBJ -> gender != "Female" ) 
-        {
-            $error .= "Please select a valid gender. <br>";
+// Password
+if (empty($DATA_OBJ->password)) {
+    $error .= "Please enter a password. <br>";
+} else {
+    if (strlen($DATA_OBJ->password) < 8) {
+        $error .= "Password must be at least 8 characters long. <br>";
+    }
+    if ($DATA_OBJ->password !== $DATA_OBJ->password2) {
+        $error .= "Passwords do not match. <br>";
+    }
+    $data['password'] = password_hash($DATA_OBJ->password, PASSWORD_DEFAULT);
+}
+
+// Country
+$data['country'] = trim($DATA_OBJ->country ?? '');
+if (empty($data['country'])) {
+    $error .= "Please select or enter your country. <br>";
+}
+
+// Birthday
+$data['birthday'] = trim($DATA_OBJ->birthday ?? '');
+if (empty($data['birthday'])) {
+    $error .= "Please enter your birthday. <br>";
+} else {
+    $birthDate = DateTime::createFromFormat('Y-m-d', $data['birthday']);
+    $today = new DateTime();
+    if (!$birthDate || $birthDate > $today) {
+        $error .= "Invalid birthday. <br>";
+    } else {
+        $age = $today->diff($birthDate)->y;
+        if ($age < 13) {
+            $error .= "You must be at least 13 years old. <br>";
         }
     }
+}
 
-    $data['email'] = $DATA_OBJ->email;
-    if(empty($DATA_OBJ->email))
-    {
-        $error .= "Please, enter a valid email. <br>";
-    }else{
+if ($error == "") {
+    $query = "INSERT INTO users 
+        (user_id, username, gender, email, password, country, birthday, date) 
+        VALUES 
+        (:user_id, :username, :gender, :email, :password, :country, :birthday, :date)";
         
-       
-       
-        if(!preg_match("/([\w\-]+\@[\w\-]+\.[\w\-]+)/", $DATA_OBJ -> email))
-        {
-            $error .= "Please enter a valid email. <br>";
-        }
-    }
+    $result = $DB->write($query, $data);
 
-    $data['password'] = $DATA_OBJ->password;
-
-    if(empty($DATA_OBJ->password))
-    {
-        $error .= "Please, enter a password. <br>";
-    }else{
-        
-        if(strlen($DATA_OBJ->password) < 8)
-        {
-            $error .= "Password must be at least 8 characters long. <br>";
-        }
-        if($DATA_OBJ->password != $DATA_OBJ->password2)
-        {
-            $error .= "Passwords do not match. <br>";
-        }
-    }
-
-    $password = $DATA_OBJ->password2;
-    
-
-    if($error == ""){
-
-        $query = "insert into users (user_id,username,gender,email,password,date) values (:user_id,:username,:gender,:email,:password,:date)";
-        $result = $DB->write($query,$data);
-
-        if($result)
-        {
-            
-            $info->message = "Your profile was created";
-            $info->data_type = "info";
-            echo json_encode($info);
-        }else {
-            $info->message = "Your profile was NOT created due to an error";
-            $info->data_type = "error";
-            echo json_encode($info);
-        }
-
-
-    }else {
-      
-        $info->message = $error;
+    if ($result) {
+        $_SESSION['userid'] = $data['user_id']; // ✅ Set session
+        $info->message = "Your profile was created.";
+        $info->data_type = "info";
+    } else {
+        $info->message = "Your profile was NOT created due to an error.";
         $info->data_type = "error";
-        echo json_encode($info);
     }
+} else {
+    $info->message = $error;
+    $info->data_type = "error";
+}
+
+echo json_encode($info);

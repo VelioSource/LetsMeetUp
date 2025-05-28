@@ -72,7 +72,17 @@ elseif(isset($DATA_OBJ->data_type) && $DATA_OBJ->data_type == "delete_thread")
     //deletes message to database
 
     include("includes/delete_thread.php");
-} 
+}
+elseif(isset($DATA_OBJ->data_type) && $DATA_OBJ->data_type == "questionnaire")
+{
+    include("includes/questionnaire.php");
+}
+elseif(isset($DATA_OBJ->data_type) && $DATA_OBJ->data_type == "get_users") {
+    include("includes/get_users.php");
+    die;
+}
+
+
 
 function message_left($data, $result)
 {

@@ -143,6 +143,16 @@
 
 }
 
+#active_contact1{
+
+   
+    height: 70px;
+    margin: 10px;
+    padding: 5px;
+
+
+}
+
 #active_contact img{
 
     width: 70px;
@@ -275,10 +285,6 @@
 .loader_off{
    display: none;
 
-}
-
-#img_viewer{
-    
 }
 
 .image_on{

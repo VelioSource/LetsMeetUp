@@ -25,7 +25,7 @@
     //user found
     $result = $result[0];
     
-    $image = ($result->gender == "Male") ? "./ui/images/user_male.jpg" : "./ui/images/user_male.jpg";
+    $image = ($result->gender == "Male") ? "./ui/images/user_male.jpg" : "./ui/images/user_female.jpg";
     if(file_exists($result->image)){
             $image= $result->image;
     }       
@@ -132,7 +132,7 @@
                 }
                 $myuser = $DB->get_user($other_user);
                
-                $image = ($myuser->gender == "Male") ? "./ui/images/user_male.jpg" : "./ui/images/user_male.jpg";
+                $image = ($myuser->gender == "Male") ? "./ui/images/user_male.jpg" : "./ui/images/user_female.jpg";
                 if(file_exists($myuser->image)){
                         $image= $myuser->image;
                 }       

@@ -4,13 +4,13 @@
     $id=$_SESSION['userid'];
     $data = $DB->read($sql,['userid'=>$id]);
     $mydata = "";
-
+$info = new stdClass(); 
  if(is_array($data))
  {
     $data = $data[0];
     
     //check if image exists
-    $image = ($data->gender == "Male") ? "./ui/images/user_male.jpg" : "./ui/images/user_male.jpg";
+    $image = ($data->gender == "Male") ? "./ui/images/user_male.jpg" : "./ui/images/user_female.jpg";
         if(file_exists($data->image)){
             $image= $data->image;
         }        
@@ -127,6 +127,7 @@
        
      ';
 
+     
      
      $info->message = $mydata;
      $info->data_type = "contacts";

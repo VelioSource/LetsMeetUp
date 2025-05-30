@@ -18,7 +18,14 @@ $purpose = $DATA_OBJ->purpose ?? '';
 $query = "INSERT INTO user_preferences 
           (user_id, interests, nationality, location, sociability, purpose) 
           VALUES 
-          (:user_id, :interests, :nationality, :location, :sociability, :purpose)";
+          (:user_id, :interests, :nationality, :location, :sociability, :purpose)
+          ON DUPLICATE KEY UPDATE 
+          interests = VALUES(interests),
+          nationality = VALUES(nationality),
+          location = VALUES(location),
+          sociability = VALUES(sociability),
+          purpose = VALUES(purpose)";
+
 
 $params = [
   'user_id' => $user_id,

@@ -1,140 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Let's Meet Up! | Sign Up</title>
-    <link rel="stylesheet" href="signupcss.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Let's Meet Up! | Sign Up</title>
+  <link rel="stylesheet" href="../LMchat/signupcss.css">
+  <style>
+    .error-msg {
+      color: red;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+  </style>
 </head>
 <body>
-    <div id="wrapper">
-        <div class="header">
-            Let's Meet Up!
-            <div style="font-size: 50px;">Sign up</div>
-        </div>
-        <div id="error" style="display:none; color:red;"></div>
-        <form id="myform">
-            <input type="text" name="username" placeholder="Username"><br>
-            <input type="text" name="email" placeholder="E-mail"><br>  
-
-            <div style="padding: 10px;">
-                <br>Gender:<br>
-                <input type="radio" value="Male" name="gender"> Male<br>
-                <input type="radio" value="Female" name="gender"> Female<br>
-            </div>
-
-            <select name="country" id="country_select" required>
-                <option value="">Select your country</option>
-                <option value="Belgium">Belgium</option>
-                <option value="Bulgaria">Bulgaria</option>
-                <option value="France">France</option>
-                <option value="Germany">Germany</option>
-                <option value="Netherlands">Netherlands</option>
-                <option value="Other">Other</option>
-            </select><br>
-
-            <input type="text" name="custom_country" id="custom_country" placeholder="Enter your country" style="display:none;"><br>
-
-            <input type="date" name="birthday" placeholder="Birthday"><br>
-
-            <input type="password" name="password" placeholder="Password"><br>
-            <input type="password" name="password2" placeholder="Retype Password"><br> 
-
-            <input type="submit" value="Sign up" id="signup_button"><br>
-
-            <br>
-            <a id="have_account" href="/login.html">
-                You already have an account? Let's Log in!
-            </a>
-        </form>
+  <div id="wrapper">
+    <div class="header">
+      Let's Meet Up!
+      <div style="font-size: 40px;">Sign up</div>
     </div>
-</body>
 
-<script>
-function _(id) {
-    return document.getElementById(id);
-}
+    <div class="error-msg" id="error"></div>
 
-_("myform").addEventListener("submit", function(e) {
-    e.preventDefault();
+    <form id="myform">
+      <input type="text" name="username" placeholder="Username"><br>
+      <input type="text" name="email" placeholder="E-mail"><br>
 
-    const error = _("error");
-    error.style.display = "none";
-    error.innerHTML = "";
+      <div style="padding: 10px;">
+        <br>Gender:<br>
+        <input type="radio" value="Male" name="gender"> Male<br>
+        <input type="radio" value="Female" name="gender"> Female<br>
+      </div>
 
-    const form = e.target;
-    const data = {};
+      <select name="country" id="country_select">
+        <option value="">Select your country</option>
+        <option value="Belgium">Belgium</option>
+        <option value="Bulgaria">Bulgaria</option>
+        <option value="France">France</option>
+        <option value="Germany">Germany</option>
+        <option value="Netherlands">Netherlands</option>
+        <option value="Other">Other</option>
+      </select><br>
 
-    data.username = form.username.value.trim();
-    data.email = form.email.value.trim();
-    data.password = form.password.value;
-    data.password2 = form.password2.value;
-    data.birthday = form.birthday.value;
+      <input type="text" name="custom_country" id="custom_country" placeholder="Enter your country" style="display:none;"><br>
 
-    const genderInputs = form.querySelectorAll("input[name='gender']");
-    genderInputs.forEach(input => {
-        if (input.checked) {
-            data.gender = input.value;
-        }
+      <input type="date" name="birthday" placeholder="Birthday"><br>
+      <input type="password" name="password" placeholder="Password"><br>
+      <input type="password" name="password2" placeholder="Retype Password"><br>
+
+      <input type="submit" value="Sign up" id="signup_button"><br><br>
+
+      <a id="have_account" href="./login.html">You already have an account? Let's Log in!</a>
+    </form>
+  </div>
+
+  <script>
+    function _(id) {
+      return document.getElementById(id);
+    }
+
+    _("country_select").addEventListener("change", function () {
+      _("custom_country").style.display = this.value === "Other" ? "block" : "none";
     });
 
-    const country = _("country_select").value;
-    const customCountry = _("custom_country").value.trim();
-    data.country = country === "Other" ? customCountry : country;
+    _("signup_button").addEventListener("click", function (e) {
+      e.preventDefault();
+      collect_data();
+    });
 
-    if (!data.username || !data.email || !data.password || !data.password2 || !data.gender || !data.country || !data.birthday) {
-        showError("Please fill in all fields.");
-        return;
+    function collect_data() {
+      const signup_button = _("signup_button");
+      signup_button.disabled = true;
+      signup_button.value = "Loading...Please wait.";
+
+      const form = _("myform");
+      const inputs = form.getElementsByTagName("input");
+
+      let data = {};
+      let hasError = false;
+
+      for (let i = 0; i < inputs.length; i++) {
+        const input = inputs[i];
+        const name = input.name;
+        const value = input.value.trim();
+
+        switch (name) {
+          case "username":
+            data.username = value;
+            if (!value) hasError = true;
+            break;
+          case "email":
+            data.email = value;
+            if (!value) hasError = true;
+            break;
+          case "gender":
+            if (input.checked) data.gender = input.value;
+            break;
+          case "birthday":
+            data.birthday = value;
+            if (!value) hasError = true;
+            break;
+          case "password":
+            data.password = value;
+            if (!value) hasError = true;
+            break;
+          case "password2":
+            data.password2 = value;
+            if (!value) hasError = true;
+            break;
+        }
+      }
+
+      const country = _("country_select").value;
+      const customCountry = _("custom_country").value.trim();
+      data.country = country === "Other" ? customCountry : country;
+
+      if (!data.gender) hasError = true;
+      if (!data.country) hasError = true;
+
+      // Even if there's an error, still send data to PHP for detailed error messages
+      send_data(data, "signup");
     }
-
-    const birthDate = new Date(data.birthday);
-    const today = new Date();
-    const age = today.getFullYear() - birthDate.getFullYear();
-    if (birthDate > today || age < 13) {
-        showError("You must be at least 13 years old.");
-        return;
-    }
-
-    // Submit to API
-    send_data(data, "signup");
-});
-
-function showError(message) {
-    const error = _("error");
-    error.innerHTML = message;
-    error.style.display = "block";
-}
 
 function send_data(data, type) {
-    const signupBtn = _("signup_button");
-    signupBtn.disabled = true;
-    signupBtn.value = "Please wait...";
+  const signup_button = _("signup_button");
+  const xml = new XMLHttpRequest();
 
-    data.data_type = type;
+  xml.onreadystatechange = function () {
+    if (xml.readyState == 4) {
+      signup_button.disabled = false;
+      signup_button.value = "Sign up";
 
-    const xml = new XMLHttpRequest();
-    xml.onload = function() {
-        signupBtn.disabled = false;
-        signupBtn.value = "Sign up";
+      if (xml.status == 200) {
+        handle_result(xml.responseText);
+      } else {
+        _("error").innerHTML = "Error: Could not connect to server.";
+        _("error").style.display = "block";
+      }
+    }
+  };
 
-        if (xml.status === 200) {
-            const response = JSON.parse(xml.responseText);
-            if (response.data_type === "info") {
-                window.location = "/LMchat/LMHomepage/Homepage/questionnaire.html"; // or wherever you want to go after signup
-            } else {
-                showError(response.message);
-            }
-        } else {
-            showError("An error occurred. Please try again.");
-        }
-    };
-    xml.open("POST", "api.php", true);
-    xml.setRequestHeader("Content-Type", "application/json");
-    xml.send(JSON.stringify(data));
+  data.data_type = type; // This tells the central PHP file what to load
+  const data_string = JSON.stringify(data);
+
+  xml.open("POST", "api.php", true); // FIXED here!
+  xml.setRequestHeader("Content-Type", "application/json");
+  xml.send(data_string);
 }
 
-_("country_select").addEventListener("change", function () {
-    _("custom_country").style.display = this.value === "Other" ? "block" : "none";
-});
-</script>
+
+    function handle_result(result) {
+      try {
+        const data = JSON.parse(result);
+        if (data.data_type === "info") {
+          window.location = "./LMHomepage/Homepage/questionnaire.html"; // Success
+        } else {
+          _("error").innerHTML = data.message || "Signup failed.";
+          _("error").style.display = "block";
+        }
+      } catch (err) {
+        _("error").innerHTML = "Server error. Please try again.";
+        _("error").style.display = "block";
+      }
+    }
+  </script>
+</body>
 </html>

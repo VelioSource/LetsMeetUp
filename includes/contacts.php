@@ -1,6 +1,11 @@
 <?php
     $myid = $_SESSION['userid'];  
-    $sql = "select * from users where user_id != '$myid' limit 10";
+    $sql = "SELECT u.* FROM users u
+        JOIN friends f ON 
+            (f.sender_id = '$myid' AND f.receiver_id = u.user_id OR 
+             f.receiver_id = '$myid' AND f.sender_id = u.user_id)
+        WHERE f.status = 'accepted' AND u.user_id != '$myid'";
+
     $myusers = $DB->read($sql,[]);
 
     $mydata =
@@ -48,7 +53,7 @@
             }
             foreach ($myusers as $row){ 
 
-                $image = ($row->gender == "Male") ? "./ui/images/user_male.jpg" : "./ui/images/user_male.jpg";
+                $image = ($row->gender == "Male") ? "./ui/images/user_male.jpg" : "./ui/images/user_female.jpg";
                 if(file_exists($row->image)){
                     $image= $row->image;
                 }  

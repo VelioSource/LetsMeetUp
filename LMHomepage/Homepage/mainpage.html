@@ -1,0 +1,452 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Let's Meet Up! | Main Page</title>
+  <link href="mainpage.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div style="margin-top: 10px; text-align: right;">
+        <button id="toggleFriendsBtn" class="chat-btn" style="width:auto;" onclick="toggleFriends()">Hide Friends</button>
+        <button onclick="window.location.href='../../index.html#settings_box'" class="chat-btn" style="width:auto;">Settings</button>
+        <button onclick="logout()" class="chat-btn" style="width:auto; background:#dc3545;">Logout</button>
+    </div>
+  <div class="container">
+    <div class="top-bar">
+      <h1>Welcome to Let's Meet Up, <span id="currentUserName"></span>!</h1>
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <div class="toggle">
+          <label>
+            <input type="checkbox" id="filterToggle" onchange="toggleFilter()" checked />
+            Show only people with similar interests
+          </label>
+        </div>
+        <input class="search-bar" type="text" placeholder="Search by name, nationality or hobbies..." />
+      </div>
+      <div id="friends-list" style="margin-top: 20px;">
+        <div class="dropdown">
+          <button class="chat-btn dropdown-toggle" onclick="toggleDropdown()">Friends ▼</button>
+          <div id="friend-entries" class="dropdown-content" style="display:none;"></div>
+        </div>
+
+      </div>
+    </div>
+    <div id="request-alert" style="display:none; margin: 10px 0; background:#ffe0e0; padding:10px 15px; border-radius:8px; font-weight:bold; color:#b30000;">
+     <!-- Populated via JS -->
+    </div>
+
+
+    <div class="profiles" id="profilesContainer">
+      <!--Profiles will be injected here-->
+    </div>
+  </div>
+
+<script>
+  let allProfiles = [];
+  let userLocation = null;
+  let userInterests = [];
+
+function toggleDropdown() {
+  const dropdown = document.getElementById("friend-entries");
+  dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+}
+
+
+function loadFriendList() {
+  fetch("../../api.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data_type: "get_friends" })
+  })
+    .then(res => res.json())
+    .then(friendData => {
+      if (friendData.data_type === "friends_list" && friendData.friends.length > 0) {
+        fetch("../../api.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data_type: "get_users" })
+        })
+          .then(res => res.json())
+          .then(users => {
+            const container = document.getElementById("friend-entries");
+            container.innerHTML = "";
+
+            friendData.friends.forEach(friendId => {
+              const friend = users.find(u => u.user_id == friendId);
+              if (friend) {
+                const div = document.createElement("div");
+                div.style.marginBottom = "10px";
+                div.innerHTML = `
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                    <div style="display: flex; flex-direction: column; max-width: 140px;">
+                      <strong style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${friend.name}</strong>
+                      <span style="font-size: 0.85em; color: #555;">${friend.nationality}</span>
+                    </div>
+                    <button class="chat-btn" onclick="startChat('${friend.user_id}')" style="padding: 4px 12px; font-size: 12px; height: 30px;">Chat</button>
+                  </div>
+                `;
+                container.appendChild(div);
+              }
+            });
+          });
+      } else {
+        document.getElementById("friend-entries").innerHTML = "<i>No friends yet</i>";
+      }
+    });
+}
+
+
+function acceptFriend(userId) {
+  fetch("../../api.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data_type: "accept_friend", user_id: userId })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.data_type === "accept_friend") {
+      // Refresh just the friend request section and profile cards
+      checkFriendRequests(); // Removes accepted request from alert box
+      loadFriendList();      // Updates friend dropdown
+      initProfiles();        // Re-renders profile cards with updated statuses
+    }
+  });
+}
+
+
+function declineFriend(userId) {
+  fetch("../../api.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data_type: "decline_friend", user_id: userId })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.data_type === "decline_friend") {
+      checkFriendRequests(); // Remove declined request from alert box
+      initProfiles();        // Optional: update UI to reflect change
+    }
+  });
+}
+
+
+
+function checkFriendRequests() {
+  fetch("../../api.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data_type: "get_requests" })
+  })
+    .then(res => res.json())
+    .then(requestData => {
+      console.log("✅ [Step 1] Friend request response:", requestData);
+
+      const alertBox = document.getElementById("request-alert");
+      if (!alertBox) {
+        console.error("❌ No element with ID 'request-alert' found!");
+        return;
+      }
+
+      alertBox.innerHTML = "";
+
+      if (requestData.data_type === "friend_requests" && requestData.requests.length > 0) {
+        alertBox.style.display = "block";
+
+        const header = document.createElement("div");
+        header.innerHTML = `<strong>You have ${requestData.requests.length} friend request${requestData.requests.length > 1 ? 's' : ''}:</strong><br>`;
+        alertBox.appendChild(header);
+
+        fetch("../../api.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data_type: "get_users" })
+        })
+          .then(res => res.json())
+          .then(allUsers => {
+            console.log("✅ [Step 2] All users response:", allUsers);
+
+            if (!Array.isArray(allUsers)) {
+              console.error("❌ Expected an array of users, but got:", allUsers);
+              return;
+            }
+
+            requestData.requests.forEach(userId => {
+              const user = allUsers.find(u => u.user_id == userId);
+              if (!user) {
+                console.warn(`⚠️ No matching user found for user_id: ${userId}`);
+                return;
+              }
+
+              const userDiv = document.createElement("div");
+              userDiv.style.cssText = "margin: 5px 0; display: flex; align-items: center; justify-content: space-between;";
+
+              const nameSpan = document.createElement("span");
+              nameSpan.textContent = `${user.name} (${user.nationality})`;
+
+              const btnContainer = document.createElement("div");
+
+              const acceptBtn = document.createElement("button");
+              acceptBtn.className = "chat-btn";
+              acceptBtn.textContent = "Accept";
+              acceptBtn.style.cssText = "width:auto; padding: 4px 10px; font-size: 12px; margin-right: 5px;";
+              acceptBtn.onclick = () => acceptFriend(user.user_id);
+
+              const declineBtn = document.createElement("button");
+              declineBtn.className = "chat-btn";
+              declineBtn.textContent = "Decline";
+              declineBtn.style.cssText = "width:auto; padding: 4px 10px; font-size: 12px; background:#ccc; color:#000;";
+              declineBtn.onclick = () => declineFriend(user.user_id);
+
+              btnContainer.appendChild(acceptBtn);
+              btnContainer.appendChild(declineBtn);
+
+              userDiv.appendChild(nameSpan);
+              userDiv.appendChild(btnContainer);
+              alertBox.appendChild(userDiv);
+            });
+          })
+          .catch(err => console.error("❌ Error fetching users:", err));
+      } else {
+        console.log("ℹ️ No pending friend requests or unexpected response.");
+        alertBox.style.display = "none";
+      }
+    })
+    .catch(err => console.error("❌ Error fetching friend requests:", err));
+}
+
+
+
+  // Get current user's info
+  fetch("../../api.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data_type: "user_info" })
+  })
+  .then(res => res.json())
+  .then(user => {
+    if (user.data_type === "user_info") {
+      document.getElementById("currentUserName").textContent = user.username || "";
+      userInterests = (user.interests || "").split(",").map(s => s.trim()).filter(Boolean);
+      initProfiles();
+      checkFriendRequests(); 
+      loadFriendList();
+    } else {
+      alert("Failed to load your preferences.");
+    }
+  });
+
+  function initProfiles() {
+    fetch("../../api.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data_type: "get_users" })
+    })
+    .then(res => res.json())
+    .then(data => {
+      allProfiles = data;
+      initLocation();
+    });
+  }
+
+  function initLocation() {
+    if (confirm("Can we use your location to help you find people near you?")) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          userLocation = {
+            lat: position.coords.latitude,
+            lon: position.coords.longitude
+          };
+          fetch("../../api.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              data_type: "update_location",
+              location_lat: userLocation.lat,
+              location_lon: userLocation.lon
+            })
+          }).then(res => res.text()).then(console.log);
+
+          renderProfiles(true);
+        },
+        () => renderProfiles(false)
+      );
+    } else {
+      renderProfiles(false);
+    }
+  }
+
+let hideFriends = false;
+
+function toggleFriends() {
+  hideFriends = !hideFriends;
+  const btn = document.getElementById("toggleFriendsBtn");
+  btn.textContent = hideFriends ? "Show Friends" : "Hide Friends";
+  renderProfiles(document.getElementById("filterToggle").checked);
+}
+
+function renderProfiles(filter = false, overrideList = null) {
+  const container = document.getElementById("profilesContainer");
+  container.innerHTML = '';
+
+  const profiles = overrideList || allProfiles;
+  let filtered = profiles;
+
+  if (hideFriends) {
+    filtered = filtered.filter(p => p.friend_status !== "friend");
+  }
+
+  if (filter) {
+    filtered = filtered.filter(profile => {
+      const hasCommon = profile.hobbies?.some(h => userInterests.includes(h));
+      if (userLocation && profile.lat && profile.lon) {
+        const dist = haversine(profile.lat, profile.lon, userLocation.lat, userLocation.lon);
+        return hasCommon && dist < 50;
+      } else {
+        return hasCommon;
+      }
+    });
+  }
+
+  for (const user of filtered) {
+    const distanceText = (userLocation && user.lat && user.lon)
+      ? `Approximately ${Math.round(haversine(user.lat, user.lon, userLocation.lat, userLocation.lon))} km away`
+      : '';
+
+    let actionBtn = '';
+    switch (user.friend_status) {
+      case "friend":
+        actionBtn = `<button class="chat-btn" disabled style="background: #6c757d;">Friends</button>`;
+        break;
+      case "pending":
+        actionBtn = `<button class="chat-btn" disabled style="background: #ffc107;">Request Pending</button>`;
+        break;
+      case "request":
+        actionBtn = `<button class="chat-btn" disabled style="background: #17a2b8;">Request Sent</button>`;
+        break;
+      default:
+        actionBtn = `<button class="chat-btn" onclick="addFriend('${user.user_id}', event)">Add Friend</button>`;
+    }
+
+    container.innerHTML += `
+      <div class="profile-card">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 10px;">
+          <img src="../../${user.image || 'uploads/default.jpg'}" alt="Profile Image" style="width: 60px; height: 60px; border-radius: 50%;">
+          <h3 style="margin: 0;">${user.name}</h3>
+        </div>
+        <p><strong>${user.nationality || ''}</strong></p>
+        <p>${user.type || ''}</p>
+        <p><strong>Hobbies:</strong></p>
+        <div class="profile-hobbies">
+          ${(user.hobbies || []).map(h => `<span>${h}</span>`).join('')}
+        </div>
+        ${distanceText ? `<p style="font-size: 0.85em; color: #555;">${distanceText}</p>` : ''}
+        ${actionBtn}
+      </div>`;
+  }
+}
+
+
+function addFriend(userId, e) {
+  if (e) e.preventDefault();
+
+  fetch("../../api.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      data_type: "add_friend",
+      user_id: userId
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log(data); // ✅ should show "Friend request sent"
+    initProfiles();    // refresh UI if needed
+  });
+}
+
+
+  function acceptFriend(userId) {
+    fetch("../../api.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data_type: "accept_friend", user_id: userId })
+    }).then(() => initProfiles());
+  }
+
+function startChat(userId) {
+  fetch("../../api.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data_type: "get_friends" })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.friends.includes(userId)) {
+      // ✅ Replace with actual path to your chat app
+      window.location.href = `/LMchat/index.html?user=${userId}`;
+    } else {
+      alert("You can only chat with users you've accepted as friends.");
+    }
+  });
+}
+
+
+
+  function toggleFilter() {
+    const filter = document.getElementById("filterToggle").checked;
+    renderProfiles(filter);
+  }
+
+  document.querySelector('.search-bar').addEventListener('input', function (e) {
+    const query = e.target.value.toLowerCase().trim();
+    const filtered = allProfiles.filter(profile =>
+      profile.name.toLowerCase().includes(query) ||
+      (profile.nationality && profile.nationality.toLowerCase().includes(query)) ||
+      (profile.hobbies && profile.hobbies.some(h => h.toLowerCase().includes(query)))
+    );
+    renderProfiles(false, filtered);
+  });
+
+  function haversine(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  function toRad(deg) {
+    return deg * Math.PI / 180;
+  }
+
+function logout() {
+  if(confirm("Are you sure you want to log out?"))
+  {
+    fetch("../../api.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data_type: "logout" })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.logged_in === false) {
+        window.location.href = "../../login.html";
+      } else {
+        alert("Logout failed.");
+      }
+    })
+    .catch(() => alert("Error while logging out."));
+  }
+}
+
+
+
+</script>
+</body>
+</html>

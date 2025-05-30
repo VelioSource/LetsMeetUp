@@ -1,0 +1,149 @@
+body {
+  font-family: 'Open Sans', sans-serif;
+  background: linear-gradient(to bottom, #f4f6f8, #e8ebf0);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  color: #333;
+}
+
+header {
+  background-color: #ffffff;
+  padding: 20px 50px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+header h1 {
+  margin: 0;
+  font-weight: 700;
+  color: #0055d4;
+}
+
+.container {
+  max-width: 600px;
+  margin: 60px auto;
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  position: relative;
+}
+
+.interests-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px 40px;
+  padding: 20px 0;
+  margin-bottom: 30px;
+}
+
+.interests-grid label {
+  font-size: 16px;
+  color: #111;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.interests-grid input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #001122;
+}
+
+.step {
+  display: none;
+  animation: fadeIn 0.5s ease;
+}
+
+.step.active {
+  display: block;
+}
+
+.step label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 15px;
+  font-size: 18px;
+}
+
+.optional-label {
+  font-weight: normal;
+  font-size: 0.9em;
+}
+
+/* Helper text under question */
+.helper-text {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+/* Country input styling */
+.country-input {
+  padding: 10px;
+  width: 100%;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.step input, .step select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.sociability-options {
+  display: flex;
+  gap: 30px;
+  margin-top: 15px;
+  margin-bottom: 30px;
+}
+
+.sociability-options label {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.sociability-options input[type="radio"] {
+  transform: scale(1.2);
+  accent-color: #0055d4;
+}
+
+.buttons {
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn {
+  background-color: #0055d4;
+  color: white;
+  padding: 12px 30px;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #00409f;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

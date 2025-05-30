@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Let's Meet Up! | Sign Up</title>
+    <link rel="stylesheet" href="signupcss.css">
+</head>
+<body>
+    <div id="wrapper">
+        <div class="header">
+            Let's Meet Up!
+            <div style="font-size: 50px;">Sign up</div>
+        </div>
+        <div id="error" style="display:none; color:red;"></div>
+        <form id="myform">
+            <input type="text" name="username" placeholder="Username"><br>
+            <input type="text" name="email" placeholder="E-mail"><br>  
+
+            <div style="padding: 10px;">
+                <br>Gender:<br>
+                <input type="radio" value="Male" name="gender"> Male<br>
+                <input type="radio" value="Female" name="gender"> Female<br>
+            </div>
+
+            <select name="country" id="country_select" required>
+                <option value="">Select your country</option>
+                <option value="Belgium">Belgium</option>
+                <option value="Bulgaria">Bulgaria</option>
+                <option value="France">France</option>
+                <option value="Germany">Germany</option>
+                <option value="Netherlands">Netherlands</option>
+                <option value="Other">Other</option>
+            </select><br>
+
+            <input type="text" name="custom_country" id="custom_country" placeholder="Enter your country" style="display:none;"><br>
+
+            <input type="date" name="birthday" placeholder="Birthday"><br>
+
+            <input type="password" name="password" placeholder="Password"><br>
+            <input type="password" name="password2" placeholder="Retype Password"><br> 
+
+            <input type="submit" value="Sign up" id="signup_button"><br>
+
+            <br>
+            <a id="have_account" href="/login.html">
+                You already have an account? Let's Log in!
+            </a>
+        </form>
+    </div>
+</body>
+
+<script>
+function _(id) {
+    return document.getElementById(id);
+}
+
+_("myform").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const error = _("error");
+    error.style.display = "none";
+    error.innerHTML = "";
+
+    const form = e.target;
+    const data = {};
+
+    data.username = form.username.value.trim();
+    data.email = form.email.value.trim();
+    data.password = form.password.value;
+    data.password2 = form.password2.value;
+    data.birthday = form.birthday.value;
+
+    const genderInputs = form.querySelectorAll("input[name='gender']");
+    genderInputs.forEach(input => {
+        if (input.checked) {
+            data.gender = input.value;
+        }
+    });
+
+    const country = _("country_select").value;
+    const customCountry = _("custom_country").value.trim();
+    data.country = country === "Other" ? customCountry : country;
+
+    if (!data.username || !data.email || !data.password || !data.password2 || !data.gender || !data.country || !data.birthday) {
+        showError("Please fill in all fields.");
+        return;
+    }
+
+    const birthDate = new Date(data.birthday);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    if (birthDate > today || age < 13) {
+        showError("You must be at least 13 years old.");
+        return;
+    }
+
+    // Submit to API
+    send_data(data, "signup");
+});
+
+function showError(message) {
+    const error = _("error");
+    error.innerHTML = message;
+    error.style.display = "block";
+}
+
+function send_data(data, type) {
+    const signupBtn = _("signup_button");
+    signupBtn.disabled = true;
+    signupBtn.value = "Please wait...";
+
+    data.data_type = type;
+
+    const xml = new XMLHttpRequest();
+    xml.onload = function() {
+        signupBtn.disabled = false;
+        signupBtn.value = "Sign up";
+
+        if (xml.status === 200) {
+            const response = JSON.parse(xml.responseText);
+            if (response.data_type === "info") {
+                window.location = "/LMchat/LMHomepage/Homepage/questionnaire.html"; // or wherever you want to go after signup
+            } else {
+                showError(response.message);
+            }
+        } else {
+            showError("An error occurred. Please try again.");
+        }
+    };
+    xml.open("POST", "api.php", true);
+    xml.setRequestHeader("Content-Type", "application/json");
+    xml.send(JSON.stringify(data));
+}
+
+_("country_select").addEventListener("change", function () {
+    _("custom_country").style.display = this.value === "Other" ? "block" : "none";
+});
+</script>
+</html>
